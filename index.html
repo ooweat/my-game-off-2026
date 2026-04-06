@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Click Rush</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #111827;
+      color: #f9fafb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    .game {
+      width: 100%;
+      max-width: 420px;
+      background: #1f2937;
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: 28px;
+    }
+    p {
+      margin: 8px 0;
+      color: #d1d5db;
+    }
+    .stats {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 20px 0;
+    }
+    .card {
+      flex: 1;
+      background: #374151;
+      padding: 12px;
+      border-radius: 12px;
+    }
+    .label {
+      font-size: 12px;
+      color: #9ca3af;
+      margin-bottom: 6px;
+    }
+    .value {
+      font-size: 24px;
+      font-weight: bold;
+    }
+    #target {
+      width: 160px;
+      height: 160px;
+      border: none;
+      border-radius: 999px;
+      background: #22c55e;
+      color: white;
+      font-size: 24px;
+      font-weight: bold;
+      cursor: pointer;
+      margin: 20px auto;
+      display: block;
+      transition: transform .08s ease, background .15s ease;
+      box-shadow: 0 8px 18px rgba(34,197,94,.35);
+    }
+    #target:active {
+      transform: scale(0.96);
+    }
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    button.action {
+      flex: 1;
+      border: none;
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 15px;
+      cursor: pointer;
+      background: #4b5563;
+      color: white;
+    }
+    button.action.primary {
+      background: #3b82f6;
+    }
+    .footer {
+      margin-top: 18px;
+      font-size: 13px;
+      color: #9ca3af;
+    }
+  </style>
+</head>
+<body>
+  <main class="game">
+    <h1>Click Rush</h1>
+    <p>10초 안에 초록 버튼을 최대한 많이 누르세요.</p>
+
+    <div class="stats">
+      <div class="card">
+        <div class="label">점수</div>
+        <div class="value" id="score">0</div>
+      </div>
+      <div class="card">
+        <div class="label">남은 시간</div>
+        <div class="value" id="time">10</div>
+      </div>
+    </div>
+
+    <button id="target">START</button>
+
+    <div class="actions">
+      <button class="action primary" id="startBtn">게임 시작</button>
+      <button class="action" id="resetBtn">리셋</button>
+    </div>
+
+    <div class="footer" id="message">시작 버튼을 눌러 플레이하세요.</div>
+  </main>
+
+  <script>
+    const scoreEl = document.getElementById("score");
+    const timeEl = document.getElementById("time");
+    const targetEl = document.getElementById("target");
+    const startBtn = document.getElementById("startBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const messageEl = document.getElementById("message");
+
+    let score = 0;
+    let timeLeft = 10;
+    let timer = null;
+    let playing = false;
+
+    function render() {
+      scoreEl.textContent = String(score);
+      timeEl.textContent = String(timeLeft);
+    }
+
+    function endGame() {
+      playing = false;
+      clearInterval(timer);
+      timer = null;
+      targetEl.textContent = "END";
+      targetEl.style.background = "#6b7280";
+      messageEl.textContent = `게임 종료! 최종 점수: ${score}`;
+    }
+
+    function startGame() {
+      score = 0;
+      timeLeft = 10;
+      playing = true;
+      targetEl.textContent = "CLICK!";
+      targetEl.style.background = "#22c55e";
+      messageEl.textContent = "버튼을 빠르게 누르세요!";
+      render();
+
+      clearInterval(timer);
+      timer = setInterval(() => {
+        timeLeft -= 1;
+        render();
+
+        if (timeLeft <= 0) {
+          endGame();
+        }
+      }, 1000);
+    }
+
+    function resetGame() {
+      playing = false;
+      clearInterval(timer);
+      timer = null;
+      score = 0;
+      timeLeft = 10;
+      targetEl.textContent = "START";
+      targetEl.style.background = "#22c55e";
+      messageEl.textContent = "시작 버튼을 눌러 플레이하세요.";
+      render();
+    }
+
+    targetEl.addEventListener("click", () => {
+      if (!playing) return;
+      score += 1;
+      render();
+    });
+
+    startBtn.addEventListener("click", startGame);
+    resetBtn.addEventListener("click", resetGame);
+
+    render();
+  </script>
+</body>
+</html>
